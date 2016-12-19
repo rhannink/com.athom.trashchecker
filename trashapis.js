@@ -43,7 +43,7 @@ function afvalapp(postcode, homenumber, country, callback){
 
   				}else{//validate the response
 
-  					return callback(null,{});
+  					return callback(null,dates);
 
 
   				}
@@ -57,33 +57,14 @@ function afvalapp(postcode, homenumber, country, callback){
 }
 
 function mijnAfvalWijzer(postcode, housenumber, country, callback){
-  var dates = {REST:
-   [ '29-12-2016',
-     '01-12-2016',
-     '03-11-2016',
-     '06-10-2016',
-     '08-09-2016',
-     '11-08-2016',
-     '14-07-2016',
-     '16-06-2016',
-     '19-05-2016',
-     '21-04-2016',
-     '24-03-2016',
-     '25-02-2016',
-     '28-01-2016' ]};
 
   var fDates = {};
   if(country !== "NL"){
     console.log('unsupported country');
-    callback(null,false);
+    callback(new Error('unsupported country'));
   }
-  var options = {
-    host:'www.mijnafvalwijzer.nl',
-    path:'nl/3825AL/41/'
-  };
 
-  request('http://www.mijnafvalwijzer.nl/nl/3571VG/7/', function(err, res, body){
-
+  request(`http://www.mijnafvalwijzer.nl/nl/${postcode}/${housenumber}/`, function(err, res, body){
     if(!err && res.statusCode == 200){
       //console.log(res);
       var $ = cheerio.load(res.body);
@@ -103,16 +84,89 @@ function mijnAfvalWijzer(postcode, housenumber, country, callback){
             if(!fDates.REST) fDates.REST = [];
             fDates.REST.push(dateStr);
           break;
+          case 'restgft':
+            if(!fDates.REST) fDates.REST = [];
+            if(!fDates.GFT) fDates.GFT = [];
+            fDates.REST.push(dateStr);
+            fDates.GFT.push(dateStr);
+          break;
+          case 'dhm':
+            if(!fDates.PAPIER) fDates.PAPIER = [];
+            if(!fDates.PMD) fDates.PMD = [];
+            fDates.PAPIER.push(dateStr);
+            fDates.PMD.push(dateStr);
+          break;
           default:
-            console.log('defaulted');
+            console.log('defaulted', elem.attribs.class);
         }
 
         //console.log(`${elem.attribs.class}:\t\t${elem.children[0].data}`);
       });
+      console.log(fDates);
+      return callback(null, fDates);
+    }else{
+      return callback(new Error('Invalid location'));
     }
-    console.log(fDates);
-    return callback(null, fDates);
+
   });
+}
+
+function afvalwijzerArnhem(postcode, housenumber, country, callback){
+  var fDates = {};
+  if(country !== "NL"){
+    console.log('unsupported country');
+    callback(new Error('unsupported country'));
+  }
+ 
+  var url = `http://www.afvalwijzer-arnhem.nl/applicatie?ZipCode=${postcode}&HouseNumber=${housenumber}&HouseNumberAddition=`;
+ // console.log(url);
+
+  request(url, function(err, res, body){
+    if(!err && res.statusCode == 200){
+      //console.log(res);
+       var $ = cheerio.load(res.body);
+       $('ul.ulPickupDates li').each((i, elem)=>{
+         var dateStr =dateFormat(elem.children[2].data.trim());
+         switch (elem.attribs.class) {
+          case 'gft':
+            if(!fDates.GFT) fDates.GFT = [];
+            fDates.GFT.push(dateStr);
+            break;
+          case 'papier':
+            if(!fDates.PAPIER) fDates.PAPIER = [];
+            fDates.PAPIER.push(dateStr);
+            break;
+          case 'restafval':
+            if(!fDates.REST) fDates.REST = [];
+            fDates.REST.push(dateStr);
+          break;
+          case 'kunststof':
+            if(!fDates.PLASTIC) fDates.PLASTIC = [];
+            fDates.PLASTIC.push(dateStr);
+          break;
+          default:
+            console.log('defaulted', elem.attribs.class);
+        }
+        // console.log(i);
+        //  console.log(elem);
+        //  console.log(elem.attribs.class);
+        // console.log(`${elem.attribs.class}:\t\t${elem.children[2].data.trim()}`);
+       }) 
+      console.log(fDates);
+      return callback(null, fDates);   
+    } else {
+       return callback(new Error('Invalid location'));
+    }
+  })
+}
+
+function dateFormat(date) {
+    var ad = date.split('-')
+    var result = ('0' + ad[0]).slice(-2) + '-' + ('0' + ad[1]).slice(-2) + '-' + ad[2];
+    console.log(result);
+
+    // add leading zero if required
+    return result;
 }
 
 function parseDate(dateString){
@@ -133,21 +187,21 @@ function parseDate(dateString){
             'december'];
   var monthNum = months.indexOf(dateArray[2]) + 1;
   if(monthNum > 0){
-    var monthString = (monthNum+1).toString();
+    var monthString = (monthNum).toString();
     if(monthString.length === 1){
       monthString = '0' + monthString;
     }
     fullString += monthString + '-';
   }else{
-    conole.log('This should not be possible...');
+    console.log('This should not be possible...');
     return 'erroneous date';
   }
   fullString += new Date().getFullYear();
-  //console.log(fullString);
   return fullString;
 }
 
 apiList.push(afvalapp);
 apiList.push(mijnAfvalWijzer);
+apiList.push(afvalwijzerArnhem);
 
 module.exports = apiList;

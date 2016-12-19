@@ -1,60 +1,21 @@
 # Trashcan Reminder
-Check when your trash will be picked up by providing your postcode and a house number.
+Homey will remind you to put the trash out! You can do this by providing a postcode, house number and country(NL/BE).
 
-# Supported cities
-Unfortunately only a few cities are supported by this app, here you can check whether or not your city is supported:
+## Supported Cities
+Unfortunately not all cities work with the Trashcan Reminder, if you can find your house with one of the links below your house is supported:
 
+- [mijnAfvalWijzer](http://www.mijnafvalwijzer.nl)
+- [deAfvalApp](http://www.deafvalapp.nl/calendar/kalender_start.jsp)
 
-Nederland
+If your city is not supported you can always add your schedule manually.
+If you wish to contribute to the project (for example by adding support for a city) I would advise you to take a look at [this explanation](https://github.com/apstemmer/com.athom.trashchecker/blob/master/developers)
 
-- Asten
-- Bergeijk
-- Best
-- Bladel
-- Boekel
-- Boxmeer
-- Buren
-- Cranendonck
-- Cuijk
-- Culemborg
-- Deurne
-- Druten
-- Echt-Susteren
-- Eersel
-- Geldermalsen
-- Geldrop-Mierlo
-- Grave
-- Heeze-Leende
-- Helmond
-- Heumen
-- Lelystad
-- Lingewaal
-- Maasdriel
-- Mill en Sint Hubert
-- Neder-Betuwe
-- Neerijnen
-- Nuenen
-- Oirschot
-- Reusel-De Mierden
-- Sint Anthonis
-- Someren
-- Son en Breugel
-- Terneuzen
-- Tiel
-- Valkenswaard
-- Veldhoven
-- West Maas en Waal
-- Zaltbommel
+## Supported Cards
+There is one card that you can place in the "then" column. The card let's you check if trash type X is collected << today, tomorrow, day after tomorrow >>.
 
-België
-
-- Bocholt
-- Genk
-- Hamont-Achel
-- Hasselt
-- Hechtel-Eksel
-- Houthalen-Helchteren
-- Lommel
-- Neerpelt
-- Overpelt
-- Peer
+## Supported Speech
+You can ask Homey four type of questions regarding your waste collection:
+- When is the green container collected?
+- What is collected next monday?
+- Is the residual waste collected this friday?
+- Which type of trash is collected next?
